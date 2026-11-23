@@ -516,7 +516,7 @@ function hanon(hand){const sc=[0,2,4,5,7,9,11],mid=d=>60+12*Math.floor(d/7)+sc[(
 const LESSONS=[
  {id:'g0-1',g:0,title:'ドレミの道',meta:'右手 ・ ドからソの5本指',bpm:80,notes:()=>seq('C4 D4 E4 F4 G4 F4 E4 D4 C4:2')},
  {id:'g0-2',g:0,title:'メリーさんの羊',meta:'右手 ・ 3音の往復',bpm:96,notes:()=>seq('E4 D4 C4 D4 E4 E4 E4:2 D4 D4 D4:2 E4 G4 G4:2 E4 D4 C4 D4 E4 E4 E4 E4 D4 D4 E4 D4 C4:4')},
- {id:'g0-3',g:0,title:'ハノン1番 セル',meta:'右手 ・ 8音セルの基本形',bpm:60,notes:()=>seq('C4:.5 E4:.5 F4:.5 G4:.5 A4:.5 G4:.5 F4:.5 E4:.5 D4:.5 F4:.5 G4:.5 A4:.5 B4:.5 A4:.5 G4:.5 F4:.5 C4:.5 E4:.5 F4:.5 G4:.5 A4:.5 G4:.5 F4:.5 E4:.5 C4:2')},
+ {id:'g0-3',g:0,title:'ハノン1番 セル',meta:'右手 ・ 8音セルの基本形',bpm:40,notes:()=>seq('C4:.5 E4:.5 F4:.5 G4:.5 A4:.5 G4:.5 F4:.5 E4:.5 D4:.5 F4:.5 G4:.5 A4:.5 B4:.5 A4:.5 G4:.5 F4:.5 C4:.5 E4:.5 F4:.5 G4:.5 A4:.5 G4:.5 F4:.5 E4:.5 C4:2')},
  {id:'g0-4',g:0,title:'きらきら星 右手',meta:'右手 ・ 全曲',bpm:90,notes:()=>seq(twinkleR)},
  {id:'g0-5',g:0,title:'きらきら星 左手',meta:'左手 ・ 根音の動き（ド／ファ／ソ）',bpm:84,notes:()=>seq(twinkleL,'L')},
  {id:'g0-6',g:0,title:'きらきら星 両手',meta:'両手 ・ 卒業曲',bpm:84,full:true,notes:()=>seq(twinkleR).concat(seq(twinkleL,'L'))},
@@ -638,7 +638,7 @@ function pickMode(l){const s=L(l.id),test=s.clearDate&&!s.mastered&&s.clearDate<
  <div class="mbtns"><button class="ghost" id="mClose">閉じる</button></div>`;
  $('result').classList.add('on');$('mClose').onclick=()=>$('result').classList.remove('on');
  $('rBox').querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{$('result').classList.remove('on');startLesson(l,b.dataset.m,{test:test&&b.dataset.m=='rhythm'})})}
-let dHand='R',dTempo=60,dNo=1;const LADDER=[40,50,60,72,84,96,108];
+let dHand='R',dTempo=40,dNo=1;const LADDER=[40,50,60,72,84,96,108];
 function renderDojo(){$('dojoDaily').textContent=S.hanon.daily==today()?'本日のデイリー 完了':'本日のデイリー +10P';
  $('dHand').innerHTML=[['R','右手'],['L','左手'],['B','両手ユニゾン']].map(h=>`<button class="ghost ${dHand==h[0]?'sel':''}" data-h="${h[0]}">${h[1]}</button>`).join('');
  $('dTempo').innerHTML=LADDER.map(t=>`<button class="ghost ${dTempo==t?'sel':''}" data-t="${t}">${t}</button>`).join('');
