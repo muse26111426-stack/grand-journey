@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-theme="mono">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -21,6 +21,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,600&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{--gold:#d8b27a;--gold2:#b8874a;--ink:#f4efe7;--sub:rgba(244,239,231,.64);--glass:rgba(24,20,16,.52);--glass2:rgba(255,248,238,.08);--line:rgba(255,240,220,.15);--red:#e07a5f;--blue:#9fb7d4}
+html[data-theme="mono"]{--gold:#e9e9ec;--gold2:#a3a3ab;--ink:#f4f4f5;--sub:rgba(244,244,245,.62);--glass:rgba(15,15,17,.55);--glass2:rgba(255,255,255,.07);--line:rgba(255,255,255,.14);--blue:#c9c9ce}
+html[data-theme="mono"] body{background:#0d0d0f}
+html[data-theme="mono"] .bg div{filter:grayscale(1) brightness(.92)}
+html[data-theme="mono"] .cta{background:linear-gradient(90deg,#f5f5f7,#c6c6cd);color:#101013;box-shadow:0 8px 20px rgba(0,0,0,.5)}
+html[data-theme="mono"] .logo svg,html[data-theme="mono"] .stat svg{stroke:#e9e9ec}
+html[data-theme="mono"] .chip.gold{border-color:rgba(255,255,255,.55)}
+html[data-theme="mono"] .spark i{background:linear-gradient(180deg,var(--gold),rgba(255,255,255,.14))}
+html[data-theme="mono"] .north::before{background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%)}
+html[data-theme="mono"] .ladder div.ok{background:rgba(255,255,255,.16)}
+html[data-theme="mono"] .item.feature{background:linear-gradient(120deg,rgba(38,38,42,.75),rgba(18,18,20,.5));border-color:rgba(255,255,255,.3)}
+html[data-theme="mono"] .scroll{scrollbar-color:rgba(255,255,255,.35) transparent}
+html[data-theme="mono"] .bar i{background:linear-gradient(90deg,var(--gold2),#ffffff)}
+html[data-theme="mono"] .countdown{text-shadow:0 0 40px rgba(255,255,255,.45)}
+@keyframes pulseM{0%{box-shadow:0 0 0 0 rgba(255,255,255,.4)}60%{box-shadow:0 0 0 14px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+html[data-theme="mono"] .k{animation-name:pulseM}
+
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{font-family:"Inter","Noto Sans JP",sans-serif;color:var(--ink);background:#120f0c;overflow:hidden;-webkit-font-smoothing:antialiased;user-select:none}
@@ -402,6 +418,7 @@ select{background:rgba(0,0,0,.35);color:var(--ink);border:1px solid var(--line);
       <div class="set-row"><div>音量<div class="d">内蔵の発音。電子ピアノ側で鳴らす場合は0に。</div></div><input type="range" id="sVol" min="0" max="1" step=".05"></div>
       <div class="set-row"><div>メトロノーム<div class="d">演奏中ずっと拍を刻む。小節の頭は高い音。演奏画面でも切り替えられる。</div></div><div class="grades" style="align-items:center;gap:14px"><button class="toggle" id="sMetOn"></button><input type="range" id="sMetVol" min="0" max="1" step=".05"></div></div>
       <div class="set-row"><div>ノーツの音名表示</div><div class="grades" id="sLabels"></div></div>
+      <div class="set-row"><div>テーマ<div class="d">UIの配色。モノトーン（グランドピアノの白黒）が標準。</div></div><div class="grades" id="sTheme"></div></div>
       <div class="set-row"><div>入力遅延の補正<div class="d">リズム判定が常に遅れる場合にプラスへ。<span id="sLatV"></span></div></div><input type="range" id="sLat" min="-100" max="150" step="5"></div>
       <div class="set-row"><div>PCキー操作<div class="d">A W S E D F T G Y H U J K O L P ; ＝ ド〜ミ（Aが C4）。Z / X でオクターブ移動。</div></div><span class="chip" id="sOct"></span></div>
       <div class="set-row" style="display:block"><div>部屋のプレビュー<div class="d">グレードで変わる部屋。クリックで一時的に表示（画面を移動すると現在の部屋に戻る）。</div></div><div class="rooms" id="rooms"></div></div>
@@ -555,9 +572,10 @@ const MASTER=[['革命のエチュード','F. Chopin',8000],['幻想即興曲','
 const KEY='grandjourney_v1';
 let dayOffset=+(localStorage.getItem(KEY+'_off')||0);
 const today=(o=0)=>{const d=new Date(Date.now()+(dayOffset+o)*864e5);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
-const def=()=>({points:0,streak:0,last:null,lessons:{},hanon:{daily:null,bestE:null,bestT:null,ladder:{},hist:[],tempoBonus:false},owned:{},log:{},grade:0,room:0,fullBonus:{},set:{vol:.6,labels:'doremi',lat:0,midi:'',metro:true,metroVol:.5,demoVol:1}});
+const def=()=>({points:0,streak:0,last:null,lessons:{},hanon:{daily:null,bestE:null,bestT:null,ladder:{},hist:[],tempoBonus:false},owned:{},log:{},grade:0,room:0,fullBonus:{},set:{vol:.6,labels:'doremi',lat:0,midi:'',metro:true,metroVol:.5,demoVol:1,theme:'mono'}});
 let S=Object.assign(def(),JSON.parse(localStorage.getItem(KEY)||'null')||{});
 S.set=Object.assign(def().set,S.set);
+const T=(g,mm)=>S.set.theme=='gold'?g:mm;const applyTheme=()=>{document.documentElement.dataset.theme=S.set.theme||'mono'};
 const save=()=>localStorage.setItem(KEY,JSON.stringify(S));
 const L=id=>S.lessons[id]||(S.lessons[id]={stars:0,clearDate:null,mastered:false,plays:{},best:0});
 const lessonsOf=g=>LESSONS.filter(l=>l.g==g);
@@ -571,7 +589,7 @@ function logPlay(ms){const d=today();S.log[d]=S.log[d]||{n:0,ms:0};S.log[d].n++;
 /* ===================== UI helpers ===================== */
 const $=id=>document.getElementById(id);
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2200)}
-const starSvg=(on,c='#d8b27a')=>`<svg viewBox="0 0 24 24" fill="${on?c:'none'}" stroke="${on?c:'rgba(244,239,231,.35)'}" stroke-width="1.5"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg>`;
+const starSvg=(on,c=T('#d8b27a','#e9e9ec'))=>`<svg viewBox="0 0 24 24" fill="${on?c:'none'}" stroke="${on?c:'rgba(244,239,231,.35)'}" stroke-width="1.5"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg>`;
 const stars=n=>`<div class="stars">${[1,2,3].map(i=>starSvg(i<=n)).join('')}</div>`;
 const bgEl=$('bg');BG_IMG.forEach(s=>{const d=document.createElement('div');d.style.backgroundImage=`url(${s})`;bgEl.appendChild(d)});
 function setBg(i){[...bgEl.children].forEach((d,k)=>d.classList.toggle('on',k==i))}
@@ -655,9 +673,9 @@ function drawChart(c,vals,max){const r=devicePixelRatio,w=c.clientWidth,h=c.clie
  x.strokeStyle='rgba(255,255,255,.08)';for(let i=0;i<=4;i++){x.beginPath();x.moveTo(0,h*i/4+.5);x.lineTo(w,h*i/4+.5);x.stroke()}
  const pts=vals.map((v,i)=>v==null?null:[vals.length<2?w/2:i*(w-10)/(vals.length-1)+5,h-6-(v/max)*(h-14)]).filter(Boolean);
  if(!pts.length){x.fillStyle='rgba(244,239,231,.4)';x.font='12px Noto Sans JP';x.fillText('MIDI鍵盤で道場をプレイすると記録される',10,h/2);return}
- const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'rgba(216,178,122,.35)');g.addColorStop(1,'rgba(216,178,122,0)');
+ const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,T('rgba(216,178,122,.35)','rgba(255,255,255,.3)'));g.addColorStop(1,T('rgba(216,178,122,0)','rgba(255,255,255,0)'));
  x.beginPath();pts.forEach((p,i)=>i?x.lineTo(...p):x.moveTo(...p));x.lineTo(pts.at(-1)[0],h);x.lineTo(pts[0][0],h);x.fillStyle=g;x.fill();
- x.beginPath();pts.forEach((p,i)=>i?x.lineTo(...p):x.moveTo(...p));x.strokeStyle='#d8b27a';x.lineWidth=2;x.stroke();pts.forEach(p=>{x.beginPath();x.arc(...p,3,0,7);x.fillStyle='#f0d4a2';x.fill()})}
+ x.beginPath();pts.forEach((p,i)=>i?x.lineTo(...p):x.moveTo(...p));x.strokeStyle=T('#d8b27a','#e9e9ec');x.lineWidth=2;x.stroke();pts.forEach(p=>{x.beginPath();x.arc(...p,3,0,7);x.fillStyle=T('#f0d4a2','#ffffff');x.fill()})}
 let libMode='learn';
 document.querySelectorAll('[data-lm]').forEach(b=>b.onclick=()=>{libMode=b.dataset.lm;document.querySelectorAll('[data-lm]').forEach(x=>x.classList.toggle('sel',x==b))});
 function libItems(){const out=[];LESSONS.forEach(l=>{if(L(l.id).clearDate)out.push({l,src:'メインで解放'})});
@@ -684,11 +702,13 @@ function cashback(){const u=unlockedGrade();let tot=0;SHOP.forEach(it=>{if(it.ma
 function renderRecords(){const days=Object.keys(S.log),tot=days.reduce((a,d)=>a+S.log[d].ms,0),n=days.reduce((a,d)=>a+S.log[d].n,0);
  $('kpis').innerHTML=[['STREAK',S.streak,'日'],['TOTAL PLAYS',n,'回'],['TOTAL TIME',Math.round(tot/60000),'分'],['MASTERED',LESSONS.filter(l=>L(l.id).mastered).length,'/ '+LESSONS.length]].map(k=>`<div class="glass kpi"><div class="label">${k[0]}</div><b>${k[1]}<small>${k[2]}</small></b></div>`).join('');
  const c=$('act'),r=devicePixelRatio,w=c.clientWidth,h=c.clientHeight;c.width=w*r;c.height=h*r;const x=c.getContext('2d');x.scale(r,r);const vals=[];for(let i=13;i>=0;i--){const d=today(-i);vals.push([d.slice(5),Math.round((S.log[d]?.ms||0)/60000)])}
- const mx=Math.max(10,...vals.map(v=>v[1])),bw=w/14;vals.forEach((v,i)=>{const bh=(v[1]/mx)*(h-26);x.fillStyle=i==13?'#d8b27a':'rgba(216,178,122,.4)';x.beginPath();x.roundRect(i*bw+bw*.25,h-18-bh,bw*.5,Math.max(2,bh),3);x.fill();x.fillStyle='rgba(244,239,231,.5)';x.font='10px Inter';x.textAlign='center';x.fillText(v[0],i*bw+bw/2,h-4)});
+ const mx=Math.max(10,...vals.map(v=>v[1])),bw=w/14;vals.forEach((v,i)=>{const bh=(v[1]/mx)*(h-26);x.fillStyle=i==13?T('#d8b27a','#f0f0f0'):T('rgba(216,178,122,.4)','rgba(255,255,255,.35)');x.beginPath();x.roundRect(i*bw+bw*.25,h-18-bh,bw*.5,Math.max(2,bh),3);x.fill();x.fillStyle='rgba(244,239,231,.5)';x.font='10px Inter';x.textAlign='center';x.fillText(v[0],i*bw+bw/2,h-4)});
  $('recTable').innerHTML='<tr><th>LESSON</th><th>BEST</th><th>ACC</th><th>CLEARED</th><th>STATUS</th></tr>'+LESSONS.map(l=>{const s=L(l.id);return `<tr><td>G${l.g} ・ ${l.title}</td><td>${stars(s.stars)}</td><td>${s.best?Math.round(s.best)+'%':'--'}</td><td>${s.clearDate||'--'}</td><td>${s.mastered?'<span class="chip gold">習得</span>':s.clearDate?'<span class="chip">テスト待ち</span>':''}</td></tr>`}).join('')}
 function renderSettings(){syncMetroUI();$('sVol').value=S.set.vol;$('sLat').value=S.set.lat;$('sLatV').textContent=` 現在 ${S.set.lat}ms`;$('sOct').textContent='基準 C'+(4+pcOct);
  $('sLabels').innerHTML=[['doremi','ドレミ'],['cde','CDE'],['none','なし']].map(o=>`<button class="ghost ${S.set.labels==o[0]?'sel':''}" data-l="${o[0]}">${o[1]}</button>`).join('');
  $('sLabels').querySelectorAll('button').forEach(b=>b.onclick=()=>{S.set.labels=b.dataset.l;save();renderSettings()});
+  $('sTheme').innerHTML=[['mono','モノトーン'],['gold','ゴールド']].map(o=>`<button class="ghost ${(S.set.theme||'mono')==o[0]?'sel':''}" data-th="${o[0]}">${o[1]}</button>`).join('');
+  $('sTheme').querySelectorAll('button').forEach(b=>b.onclick=()=>{S.set.theme=b.dataset.th;applyTheme();save();renderSettings()});
  $('rooms').innerHTML=ROOMS.map((r,i)=>`<button style="background-image:url(${BG_IMG[i]})" class="${i==S.room?'cur':''}" data-r="${i}"><span>${i+1}. ${r.name}${i>S.room?' ・ 未解放':''}</span></button>`).join('');
  $('rooms').querySelectorAll('button').forEach(b=>b.onclick=()=>{document.body.classList.remove('dim');setBg(+b.dataset.r)})}
 $('sVol').oninput=e=>{S.set.vol=+e.target.value;save()};$('sLat').oninput=e=>{S.set.lat=+e.target.value;$('sLatV').textContent=` 現在 ${S.set.lat}ms`;save()};
@@ -842,32 +862,32 @@ function loop(now){if(!P)return;
 function draw(now){const{W,H,kh,ky,keys}=layout(),pxB=Math.max(90,(ky-80)/(P.mode=='learn'?5:6));
  cx.clearRect(0,0,W,H);const grd=cx.createLinearGradient(0,0,0,ky);grd.addColorStop(0,'rgba(10,8,6,.2)');grd.addColorStop(1,'rgba(10,8,6,.75)');cx.fillStyle=grd;cx.fillRect(0,0,W,ky);
  for(let m=P.lo;m<=P.hi;m++){const k=keys[m];if(!k||k.b)continue;if(m%12==0){cx.fillStyle='rgba(255,240,220,.08)';cx.fillRect(k.x,0,1,ky)}}
- const b0=Math.floor(P.beat);for(let b=b0;b<b0+12;b++){const y=ky-(b-P.beat)*pxB;if(y<0)break;cx.fillStyle=b%4==0?'rgba(255,240,220,.1)':'rgba(255,240,220,.035)';cx.fillRect(40,y,W-80,1)}
+ const b0=Math.floor(P.beat);for(let b=b0;b<b0+12;b++){const y=ky-(b-P.beat)*pxB;if(y<0)break;cx.fillStyle=b%4==0?T('rgba(255,240,220,.1)','rgba(255,255,255,.1)'):T('rgba(255,240,220,.035)','rgba(255,255,255,.035)');cx.fillRect(40,y,W-80,1)}
  const nextSet=new Set();if(P.waiting)nextSet.add(60);else if(P.mode=='learn'){const g=P.groups[P.gi];P.notes.forEach(n=>{if(n.t==g&&!n.hit)nextSet.add(n.m)})}
  cx.font='600 12px Noto Sans JP';cx.textAlign='center';
  if(!P.waiting)P.notes.forEach(n=>{const k=keys[n.m];if(!k)return;const y1=ky-(n.t-P.beat)*pxB,y0=y1-n.d*pxB+4;if(y0>ky+40||y1<-20)return;
-  const w=k.b?k.w:k.w-6,x=k.b?k.x:k.x+3;const Lh=n.h=='L';let c1=Lh?'#a9c1dc':'#f0d4a2',c2=Lh?'#5f7da0':'#b8874a';
+  const w=k.b?k.w:k.w-6,x=k.b?k.x:k.x+3;const Lh=n.h=='L';let c1=Lh?T('#a9c1dc','#9a9aa0'):T('#f0d4a2','#ffffff'),c2=Lh?T('#5f7da0','#55555c'):T('#b8874a','#b9b9be');
   if(n.judge=='MISS'){c1='rgba(224,122,95,.45)';c2='rgba(224,122,95,.2)'}if(n.hit){c1='rgba(255,255,255,.18)';c2='rgba(255,255,255,.05)'}
   const g=cx.createLinearGradient(0,y0,0,y1);g.addColorStop(0,c2);g.addColorStop(1,c1);cx.fillStyle=g;cx.beginPath();cx.roundRect(x,y0,w,Math.max(8,y1-y0),6);cx.fill();
   if(!n.hit&&nextSet.has(n.m)){cx.strokeStyle='#fff';cx.lineWidth=2;cx.stroke()}
   if(S.set.labels!='none'&&!n.hit&&y1-y0>18){cx.fillStyle=Lh?'#0f1a28':'#2a1a0a';cx.fillText((S.set.labels=='doremi'?JP:EN)[n.m%12].replace('#','♯'),x+w/2,y1-8)}});
- const hl=cx.createLinearGradient(0,0,W,0);hl.addColorStop(0,'rgba(216,178,122,0)');hl.addColorStop(.5,'rgba(240,212,162,.95)');hl.addColorStop(1,'rgba(216,178,122,0)');cx.fillStyle=hl;cx.fillRect(0,ky-2,W,2);
- cx.fillStyle='#14110e';cx.fillRect(30,ky,W-60,kh+10);
+ const hl=cx.createLinearGradient(0,0,W,0);hl.addColorStop(0,T('rgba(216,178,122,0)','rgba(255,255,255,0)'));hl.addColorStop(.5,T('rgba(240,212,162,.95)','rgba(255,255,255,.95)'));hl.addColorStop(1,T('rgba(216,178,122,0)','rgba(255,255,255,0)'));cx.fillStyle=hl;cx.fillRect(0,ky-2,W,2);
+ cx.fillStyle=T('#14110e','#101013');cx.fillRect(30,ky,W-60,kh+10);
  const pulse=.5+.5*Math.sin(now/260);
  const lit=m=>{const f=P.keyFx[m];return held.has(m)?(f&&f.ok===false?'bad':'on'):null};
  for(const m in keys){const k=keys[m];if(k.b)continue;const s=lit(+m);const g=cx.createLinearGradient(0,ky,0,ky+kh);
-  if(s=='on'){g.addColorStop(0,'#ffe3b3');g.addColorStop(1,'#d8b27a')}else if(s=='bad'){g.addColorStop(0,'#f3c2b5');g.addColorStop(1,'#e07a5f')}
-  else if(nextSet.has(+m)&&P.waiting){g.addColorStop(0,`rgba(255,${226+pulse*10|0},${180+pulse*20|0},1)`);g.addColorStop(1,`rgb(${216+pulse*20|0},${178+pulse*20|0},122)`)}
-  else if(nextSet.has(+m)){g.addColorStop(0,'#fbf3e4');g.addColorStop(1,'#efd9b2')}else{g.addColorStop(0,'#f7f3ec');g.addColorStop(1,'#ddd5c9')}
+  if(s=='on'){g.addColorStop(0,T('#ffe3b3','#ffffff'));g.addColorStop(1,T('#d8b27a','#c9c9cf'))}else if(s=='bad'){g.addColorStop(0,'#f3c2b5');g.addColorStop(1,'#e07a5f')}
+  else if(nextSet.has(+m)&&P.waiting){g.addColorStop(0,T(`rgba(255,${226+pulse*10|0},${180+pulse*20|0},1)`,'rgba(255,255,255,1)'));g.addColorStop(1,T(`rgb(${216+pulse*20|0},${178+pulse*20|0},122)`,'rgb(205,205,212)'))}
+  else if(nextSet.has(+m)){g.addColorStop(0,T('#fbf3e4','#ffffff'));g.addColorStop(1,T('#efd9b2','#d9d9de'))}else{g.addColorStop(0,T('#f7f3ec','#f4f4f6'));g.addColorStop(1,T('#ddd5c9','#cfcfd4'))}
   cx.fillStyle=g;cx.beginPath();cx.roundRect(k.x+1,ky+2,k.w-2,kh,[0,0,5,5]);cx.fill();
   if(+m%12==0){cx.fillStyle='rgba(40,30,20,.45)';cx.font='500 10px Inter';cx.fillText('C'+(Math.floor(m/12)-1),k.x+k.w/2,ky+kh-8)}}
  for(const m in keys){const k=keys[m];if(!k.b)continue;const s=lit(+m);const g=cx.createLinearGradient(0,ky,0,ky+kh*.62);
-  if(s=='on'){g.addColorStop(0,'#e7c38c');g.addColorStop(1,'#b8874a')}else if(s=='bad'){g.addColorStop(0,'#e07a5f');g.addColorStop(1,'#8a3d2c')}else if(nextSet.has(+m)){g.addColorStop(0,'#6b5435');g.addColorStop(1,'#3a2c1b')}else{g.addColorStop(0,'#2e2a27');g.addColorStop(1,'#0b0a09')}
+  if(s=='on'){g.addColorStop(0,T('#e7c38c','#f0f0f2'));g.addColorStop(1,T('#b8874a','#8e8e96'))}else if(s=='bad'){g.addColorStop(0,'#e07a5f');g.addColorStop(1,'#8a3d2c')}else if(nextSet.has(+m)){g.addColorStop(0,T('#6b5435','#6a6a70'));g.addColorStop(1,T('#3a2c1b','#2c2c30'))}else{g.addColorStop(0,T('#2e2a27','#2b2b2f'));g.addColorStop(1,T('#0b0a09','#0a0a0b'))}
   cx.fillStyle=g;cx.beginPath();cx.roundRect(k.x,ky+2,k.w,kh*.62,[0,0,4,4]);cx.fill()}
  if(P.waiting&&keys[60]){const k=keys[60],x=k.x+k.w/2;cx.strokeStyle=`rgba(240,212,162,${.4+.5*pulse})`;cx.lineWidth=2;cx.beginPath();cx.moveTo(x,ky-60);cx.lineTo(x,ky-14);cx.stroke();cx.beginPath();cx.moveTo(x-7,ky-22);cx.lineTo(x,ky-12);cx.lineTo(x+7,ky-22);cx.stroke()}
- P.fx=P.fx.filter(f=>now-f.t<600);P.fx.forEach(f=>{const k=keys[f.m];if(!k)return;const a=1-(now-f.t)/600;cx.globalAlpha=a;cx.font='600 13px Inter';cx.fillStyle=f.txt=='MISS'?'#e07a5f':f.txt=='CRITICAL'?'#ffe9a8':f.txt=='PERFECT'?'#f0d4a2':f.txt=='GOOD'?'#9fb4c8':'#cfe0f0';cx.fillText(f.txt,k.x+k.w/2,ky-20-(1-a)*24);cx.globalAlpha=1;
-  if(f.txt!='MISS'){cx.strokeStyle=`rgba(240,212,162,${a})`;cx.lineWidth=2;cx.beginPath();cx.arc(k.x+k.w/2,ky,10+(1-a)*26,0,7);cx.stroke()}});
- if((P.mode=='rhythm'||P.mode=='score')&&P.combo>=5){cx.font='600 64px Cormorant Garamond';cx.fillStyle='rgba(240,212,162,.18)';cx.fillText(P.combo,W/2,ky*.45)}}
+ P.fx=P.fx.filter(f=>now-f.t<600);P.fx.forEach(f=>{const k=keys[f.m];if(!k)return;const a=1-(now-f.t)/600;cx.globalAlpha=a;cx.font='600 13px Inter';cx.fillStyle=f.txt=='MISS'?'#e07a5f':f.txt=='CRITICAL'?T('#ffe9a8','#ffffff'):f.txt=='PERFECT'?T('#f0d4a2','#e6e6e6'):f.txt=='GOOD'?T('#9fb4c8','#9a9aa0'):T('#cfe0f0','#c9c9ce');cx.fillText(f.txt,k.x+k.w/2,ky-20-(1-a)*24);cx.globalAlpha=1;
+  if(f.txt!='MISS'){cx.strokeStyle=T(`rgba(240,212,162,${a})`,`rgba(255,255,255,${a})`);cx.lineWidth=2;cx.beginPath();cx.arc(k.x+k.w/2,ky,10+(1-a)*26,0,7);cx.stroke()}});
+ if((P.mode=='rhythm'||P.mode=='score')&&P.combo>=5){cx.font='600 64px Cormorant Garamond';cx.fillStyle=T('rgba(240,212,162,.18)','rgba(255,255,255,.16)');cx.fillText(P.combo,W/2,ky*.45)}}
 cv.addEventListener('pointerdown',e=>{if(!P)return;const{ky,kh,keys}=layout();if(e.clientY<ky)return;let hit=null;
  for(const m in keys){const k=keys[m];if(k.b&&e.clientX>=k.x&&e.clientX<=k.x+k.w&&e.clientY<=ky+kh*.62){hit=+m;break}}
  if(hit==null)for(const m in keys){const k=keys[m];if(!k.b&&e.clientX>=k.x&&e.clientX<k.x+k.w){hit=+m;break}}
@@ -968,7 +988,7 @@ function showResult(p,st,acc,earn,msg){const tot=earn.reduce((a,e)=>a+e[1],0);if
 function login(){const d=today();if(S.last==d)return;S.streak=S.last==today(-1)?S.streak+1:1;S.last=d;addPts(10);save();toast(`ログインボーナス +10P ・ ${S.streak}日連続`)}
 const wv=$('wave');for(let k=0;k<26;k++){const i=document.createElement('i');i.style.height=Math.max(4,40-Math.abs(13-k)*2.6+Math.random()*8)+'px';i.style.animationDelay=(k*.06)+'s';wv.appendChild(i)}
 S.grade=calcGrade();S.room=Math.max(S.room,GRADES[S.grade].room);
-login();cashback();go('home');loadSamples();
+login();cashback();applyTheme();go('home');loadSamples();
 
 </script>
 <script>/* ============ SONG ROOM ― お手本・譜読みはいつでも（v1.5） ============ */
